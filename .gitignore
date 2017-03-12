@@ -1,0 +1,7 @@
+venv
+.cache
+feednux/__pycache__
+feednux/.cache
+feednux/feedly/__pycache__
+feednux/feedly/tests
+feednux/ui/__pycache__
