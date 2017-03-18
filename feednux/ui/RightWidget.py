@@ -44,17 +44,17 @@ class ShowEntryWidget(QWebEngineView):
     Attributes:
     - entry_id (int)
     """
-    def __init__(self, entry_id):
+    def __init__(self, entry_raw):
         """
         Arguments:
         - entry_id(int) The id of the entry to render
         """
         super().__init__()
-        self.entry_id = entry_id
+        self.entry_raw = entry_raw
         self.initUI()
 
     def initUI(self):
-        entry = Entry(None, self.entry_id)
+        entry = Entry(self.entry_raw)
         contents = entry.getContent()
         html_content = contents['content']
         self.setHtml(html_content)

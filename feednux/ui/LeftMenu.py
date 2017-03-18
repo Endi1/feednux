@@ -9,11 +9,11 @@ class LeftMenu(QListWidget):
     Attributes:
     - feedly (Feedly)
     """
-    
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
         self.feedly = Feedly(access_token)
-        self.itemDoubleClicked.connect(self.itemClick)
+        self.parent = parent
+        self.itemDoubleClicked.connect(self.parent.categoryClicked)
         self.setFixedWidth(160)
         self.initUI()
 
@@ -23,7 +23,3 @@ class LeftMenu(QListWidget):
             item = QListWidgetItem(category.getLabel())
             item.setData(QtCore.Qt.UserRole, category)
             self.addItem(item)
-
-    def itemClick(self, item):
-        category = item.data(QtCore.Qt.UserRole)
-        print(category.getLabel())

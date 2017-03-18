@@ -51,25 +51,35 @@ class CentralWidget(QWidget):
         categories = self.feedly.getCategories()
         
         """:LeftMenu(QListWidget): left_menu"""
-        self.left_menu = LeftMenu()
+        self.left_menu = LeftMenu(self)
 
         """:ShowStreamWidget(QListWidget): show_stream_widget"""
-        self.show_stream_widget = ShowStreamWidget(self, self.feedly, categories[0].getId())
+        self.right_widget = ShowStreamWidget(self, self.feedly, categories[0].getId())
         
         self.hbox.addWidget(self.left_menu)
-        self.hbox.addWidget(self.show_stream_widget)
+        self.hbox.addWidget(self.right_widget)
 
         self.show()
 
+    def _removeWidget(self, widget):
+        self.hbox.removeWidget(widget)
+        widget.close()
+        widget = None
+
     def entryClicked(self, item):
         """Remove show_stream_widget and add show_entry_widget"""
-        self.hbox.removeWidget(self.show_stream_widget)
-        self.show_stream_widget.close()
-        self.show_stream_widget = None
+        self._removeWidget(self.right_widget)
 
         chosen_entry = item.data(QtCore.Qt.UserRole)
-        self.show_entry_widget = ShowEntryWidget(chosen_entry.entry_id)
-        self.hbox.addWidget(self.show_entry_widget)
+        self.right_widget = ShowEntryWidget(chosen_entry.getRaw())
+        self.hbox.addWidget(self.right_widget)
+        
+    def categoryClicked(self, item):
+        self._removeWidget(self.right_widget)
+        
+        chosen_category = item.data(QtCore.Qt.UserRole)
+        self.right_widget = ShowStreamWidget(self, self.feedly, chosen_category.getId())
+        self.hbox.addWidget(self.right_widget)
 
 
 

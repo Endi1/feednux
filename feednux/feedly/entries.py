@@ -1,21 +1,27 @@
-import requests
-import json
-
 # TODO Finish implementing all the API, especially thumbnails and images
 # TODO figure out how links really work
 
 class Entry:
+    """Implementation of the Entry from the feedly API
 
-    def __init__(self, raw=None, entry_id=None):
+    Attributes:
+    - raw (JSON)
+    - entry_id (int)
+    - unread (bool)
+    - origin (str)
+    - title (str)
+    - link (str)
+    - categories ([str])
+    - content (str)
+"""
 
-        if entry_id == None and raw == None:
-            self = None
-        elif entry_id != None:
-            url = 'https://cloud.feedly.com/v3/entries/'+entry_id[11:]
-            response = requests.get(url)
-            self._buildInstance(json.loads(response.content)[0])
-        else:
-            self._buildInstance(raw)
+    def __init__(self, raw):
+        """
+        Arguments
+        - raw(JSON) The raw JSON implementation from the Feedly API
+        """
+        self.raw = raw
+        self._buildInstance(self.raw)
 
     def _buildInstance(self, raw):
         self.raw = raw
@@ -49,3 +55,6 @@ class Entry:
 
     def getContent(self):
         return self.content
+
+    def getRaw(self):
+        return self.raw
