@@ -39,12 +39,16 @@ class CentralWidget(QWidget):
         self.top = 10
         self.width = 320
         self.height = 240
+        self.setStyleSheet("""
+        QWidget {background-color: #e8eaef}
+        """)
         self.initUI()
 
     def initUI(self):
         """Build the UI for the central widget. Takes no arguments."""
         
         self.hbox = QHBoxLayout(self)
+        self.hbox.setSpacing(0)
         self.hbox.setAlignment(QtCore.Qt.AlignLeft)
 
         """:[Category] categories:"""

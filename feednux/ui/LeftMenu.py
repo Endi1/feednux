@@ -13,13 +13,18 @@ class LeftMenu(QListWidget):
         super().__init__()
         self.feedly = Feedly(access_token)
         self.parent = parent
-        self.itemDoubleClicked.connect(self.parent.categoryClicked)
-        self.setFixedWidth(160)
+        self.itemPressed.connect(self.parent.categoryClicked)
+        self.setFixedWidth(250)
+        self.setStyleSheet("""
+        QListWidget {background-color: #3e4860; color: white}
+        """)
         self.initUI()
 
     def initUI(self):
         categories = self.feedly.getCategories()
         for category in categories:
             item = QListWidgetItem(category.getLabel())
+            item.setTextAlignment(QtCore.Qt.AlignCenter)
+            item.setSizeHint(QtCore.QSize(250, 30))
             item.setData(QtCore.Qt.UserRole, category)
             self.addItem(item)
