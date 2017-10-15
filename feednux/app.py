@@ -1,14 +1,13 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QHBoxLayout, QPushButton
-from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QHBoxLayout
 from PyQt5 import QtCore
 
 from ui.LeftMenu import LeftMenu
 from ui.RightWidget import ShowStreamWidget
 from ui.RightWidget import ShowEntryWidget
 
-from feedly.Feedly import Feedly
-from config import access_token
+from local.Local import Local
+
 
 class App(QMainWindow):
 
@@ -33,7 +32,7 @@ class CentralWidget(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.feedly = Feedly(access_token)
+        self.local = Local()
         self.left = 0
         self.right = 0
         self.top = 10
@@ -46,20 +45,17 @@ class CentralWidget(QWidget):
 
     def initUI(self):
         """Build the UI for the central widget. Takes no arguments."""
-        
         self.hbox = QHBoxLayout(self)
         self.hbox.setSpacing(0)
         self.hbox.setAlignment(QtCore.Qt.AlignLeft)
 
-        """:[Category] categories:"""
-        categories = self.feedly.getCategories()
-        
+        feeds = self.local.getFeeds()
         """:LeftMenu(QListWidget): left_menu"""
         self.left_menu = LeftMenu(self)
 
         """:ShowStreamWidget(QListWidget): show_stream_widget"""
-        self.right_widget = ShowStreamWidget(self, self.feedly, categories[0].getId())
-        
+        self.right_widget = ShowStreamWidget(self, self.local,
+                                            feeds[0])
         self.hbox.addWidget(self.left_menu)
         self.hbox.addWidget(self.right_widget)
 
@@ -75,16 +71,16 @@ class CentralWidget(QWidget):
         self._removeWidget(self.right_widget)
 
         chosen_entry = item.data(QtCore.Qt.UserRole)
-        self.right_widget = ShowEntryWidget(chosen_entry.getRaw())
-        self.hbox.addWidget(self.right_widget)
-        
-    def categoryClicked(self, item):
-        self._removeWidget(self.right_widget)
-        
-        chosen_category = item.data(QtCore.Qt.UserRole)
-        self.right_widget = ShowStreamWidget(self, self.feedly, chosen_category.getId())
+        self.right_widget = ShowEntryWidget(chosen_entry)
         self.hbox.addWidget(self.right_widget)
 
+    def categoryClicked(self, item):
+        self._removeWidget(self.right_widget)
+
+        chosen_feed = item.data(QtCore.Qt.UserRole)
+        self.right_widget = ShowStreamWidget(self, self.local,
+                                             chosen_feed)
+        self.hbox.addWidget(self.right_widget)
 
 
 if __name__ == '__main__':

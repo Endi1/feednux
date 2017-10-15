@@ -5,6 +5,7 @@ from feedly.categories import Category
 from feedly.subscriptions import Subscription
 from feedly.streams import Stream
 
+
 class Feedly:
     """Main feedly instance.
     Attributes:
@@ -26,13 +27,11 @@ class Feedly:
         """
         Arguments:
         - stream_id(string): The id of the stream to return
-        
         Returns:
         - stream(Stream): The stream with id=stream_id
         """
         stream = Stream(stream_id, self._headers)
         return stream
-        
 
     def getSubscriptions(self):
         subscriptions = []
