@@ -9,7 +9,7 @@ class ShowStreamWidget(QListWidget):
     Attributes:
     - parent (QWidget)
     - local (Local)
-    - stream_url (str)
+    - feed (tuple)
     """
     def __init__(self, parent, local, feed):
         """

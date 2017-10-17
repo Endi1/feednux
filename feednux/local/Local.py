@@ -29,31 +29,42 @@ class Local:
 
     def __saveToDB(self):
         items = []
+
+        for item in self._opml_result.feeds:
+            title = item.title.encode('utf-8')
+            url = item.url.encode('utf-8')
+
+            self.cursor.execute("""SELECT * FROM feeds
+            WHERE title=?""", (title,))
+
+            if self.cursor.fetchone() is None:
+                items.append((None, title, url))
+
+        self.cursor.executemany("""INSERT INTO feeds VALUES (?, ?, ?)""",
+                                items)
+        self.conn.commit()
+
+    def getFeeds(self):
+
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS feeds
         (id integer primary key not null ,
         title text not null,
         url text not null)""")
 
-
-        for item in self._opml_result.feeds:
-            title = item.title.encode('utf-8')
-            url = item.url.encode('utf-8')
-            items.append((None, title, url))
-
-        self.cursor.executemany("""INSERT INTO feeds VALUES (?, ?, ?)""",
-                                items)
-        self.conn.commit()
-        self.conn.close()
-
-    def getFeeds(self):
         feeds = []
         self.cursor.execute("SELECT * FROM feeds")
         feeds = self.cursor.fetchall()
 
         return feeds
 
-    def cacheEntriesFromFeed(self, feed):
+    def addFeed(self, title, url):
+        self.cursor.execute("""SELECT * FROM feeds WHERE title=?""", title)
 
+        if self.cursor.fetchone() is None:
+            self.cursor.execute("""INSERT INTO feeds
+            VALUES (?, ?, ?)""", (None, title, url))
+
+    def cacheEntriesFromFeed(self, feed):
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS entries
         (id integer primary key not null ,
         title text not null,

@@ -1,10 +1,17 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QHBoxLayout
+from PyQt5.QtWidgets import (
+    QFileDialog,
+    QApplication,
+    QWidget,
+    QMainWindow,
+    QHBoxLayout,
+)
 from PyQt5 import QtCore
 
 from ui.LeftMenu import LeftMenu
 from ui.RightWidget import ShowStreamWidget
 from ui.RightWidget import ShowEntryWidget
+from ui.MenuBar import MenuBar
 
 from local.Local import Local
 
@@ -14,10 +21,13 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.title = "Feednux"
+        self.frameSize()
         self.initUI()
 
     def initUI(self):
         cw = CentralWidget()
+        mb = MenuBar()
+        self.setMenuWidget(mb)
         self.setCentralWidget(cw)
         self.setWindowTitle(self.title)
         self.show()
@@ -33,33 +43,45 @@ class CentralWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.local = Local()
-        self.left = 0
-        self.right = 0
-        self.top = 10
-        self.width = 320
-        self.height = 240
         self.setStyleSheet("""
-        QWidget {background-color: #e8eaef}
+        QWidget {background-color: #e8eaef; border: 0px}
         """)
         self.initUI()
 
     def initUI(self):
+        self.setContentsMargins(QtCore.QMargins(0, 0, 0, 0))
         """Build the UI for the central widget. Takes no arguments."""
         self.hbox = QHBoxLayout(self)
         self.hbox.setSpacing(0)
         self.hbox.setAlignment(QtCore.Qt.AlignLeft)
 
         feeds = self.local.getFeeds()
+
+        if len(feeds) == 0:
+            filename = self._openFileDialog()
+
+            if filename[0] == "":
+                self.parent().close()
+            self.local.parseOpml(filename[0])
+            feeds = self.local.getFeeds()
+
         """:LeftMenu(QListWidget): left_menu"""
         self.left_menu = LeftMenu(self)
 
         """:ShowStreamWidget(QListWidget): show_stream_widget"""
         self.right_widget = ShowStreamWidget(self, self.local,
-                                            feeds[0])
+                                                     feeds[0])
+
         self.hbox.addWidget(self.left_menu)
         self.hbox.addWidget(self.right_widget)
 
         self.show()
+
+    def _openFileDialog(self):
+            fd = QFileDialog(self, "Import OPML file")
+            filename = fd.getOpenFileName()
+            return filename
+
 
     def _removeWidget(self, widget):
         self.hbox.removeWidget(widget)
