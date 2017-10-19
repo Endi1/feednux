@@ -25,7 +25,7 @@ class LeftMenu(QListWidget):
     def initUI(self):
         feeds = self.local.getFeeds()
         for feed in feeds:
-            item = QListWidgetItem(feed[1].decode('utf-8'))
+            item = QListWidgetItem(feed[1])
             item.setTextAlignment(QtCore.Qt.AlignCenter)
             item.setSizeHint(QtCore.QSize(250, 30))
             item.setData(QtCore.Qt.UserRole, feed)

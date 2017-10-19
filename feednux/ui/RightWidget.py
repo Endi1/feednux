@@ -1,7 +1,7 @@
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QLabel
+from PyQt5.QtWidgets import QListWidget, QListWidgetItem
+from PyQt5 import QtGui
 from PyQt5 import QtCore
-import html
 
 
 class ShowStreamWidget(QListWidget):
@@ -23,10 +23,10 @@ class ShowStreamWidget(QListWidget):
         self.stream_url = feed[2]
         self.local = local
         self.parent = parent
-        self.itemDoubleClicked.connect(self.parent.entryClicked)
+        self.itemClicked.connect(self.parent.entryClicked)
         self.setStyleSheet("""
         QListWidget {background-color: #3e4860; color: #D0D4E0; font: 16px bold}
-        QListWidget::item {margin: 2px; width: 100%}
+        QListWidget::item {margin: 10px; width: 100%; font-weight: 600}
         QListWidget::item:hover:!pressed {background-color: #6c7a9b}
         QListWidget::item:selected {background-color: #6c7a9b}
         """)
@@ -36,8 +36,11 @@ class ShowStreamWidget(QListWidget):
         self.stream = self.local.getEntriesForFeed(self.feed)
 
         for entry in self.stream:
-            body = entry[1] + "\n" + entry[3]
-            item = QListWidgetItem(body)
+            title = entry[1]
+            item = QListWidgetItem(title)
+            font = QtGui.QFont()
+            font.setBold(True)
+            item.setFont(font)
             item.setData(QtCore.Qt.UserRole, entry)
             self.addItem(item)
 

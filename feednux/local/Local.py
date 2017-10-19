@@ -31,8 +31,8 @@ class Local:
         items = []
 
         for item in self._opml_result.feeds:
-            title = item.title.encode('utf-8')
-            url = item.url.encode('utf-8')
+            title = item.title
+            url = item.url
 
             self.cursor.execute("""SELECT * FROM feeds
             WHERE title=?""", (title,))
@@ -57,12 +57,15 @@ class Local:
 
         return feeds
 
-    def addFeed(self, title, url):
-        self.cursor.execute("""SELECT * FROM feeds WHERE title=?""", title)
+    def addFeed(self, url):
+        stream = feedparser.parse(url)
+        title = stream.feed.title
+        self.cursor.execute("""SELECT * FROM feeds WHERE url=?""", (url,))
 
         if self.cursor.fetchone() is None:
             self.cursor.execute("""INSERT INTO feeds
             VALUES (?, ?, ?)""", (None, title, url))
+            self.conn.commit()
 
     def cacheEntriesFromFeed(self, feed):
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS entries
@@ -76,7 +79,7 @@ class Local:
 
         stream_url = feed[2]
         stream_id = feed[0]
-        stream = feedparser.parse(stream_url.decode('utf-8'))
+        stream = feedparser.parse(stream_url)
         entries = stream.entries
         uncached_entries = []
 
